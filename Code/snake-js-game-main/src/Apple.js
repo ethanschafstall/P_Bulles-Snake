@@ -1,10 +1,9 @@
 
 export class Apple
 {
-    constructor(x,y,color)
+    constructor(x,y)
     {
         this.x = x;
         this.y = y;
-        this.color = color;
     }    
 }

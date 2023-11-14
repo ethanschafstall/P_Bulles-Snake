@@ -1,10 +1,8 @@
 export class Segment
 {
-    constructor(x,y,color,isHead)
+    constructor(x,y)
     {
         this.x = x;
         this.y = y;
-        this.color = color;
-        this.isHead = isHead;
     }    
 }

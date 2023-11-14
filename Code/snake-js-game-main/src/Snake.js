@@ -3,18 +3,8 @@ import { Segment } from "./Segment";
 
 export class Snake
 {
-    constructor(x,y)
+    constructor(x,y,spacer)
     {
-        this.x = x;
-        this.y = y;
-        this.segments = [new Segment(10,10,green,false),new Segment(10,11,green,false),new Segment(10,12,green,false),new Segment(10,14,green,true)];
+        this.segments = [new Segment(x,y),new Segment(x+spacer,y),new Segment(x+spacer*2,y)];
     }
-    Eat(Apple)
-    {
-        let index = this.segments.lastIndexOf(this.segments);
-        this.segments[index].isHead = false;
-        this.segments.push(new Segment(Apple.x,Apple.y,darkgreen,true));
-    }    
 }
-
-let snake = new Snake (10,10);
