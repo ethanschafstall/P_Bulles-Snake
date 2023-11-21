@@ -3,12 +3,33 @@ import { Snake } from './Snake.js';
 import { Segment } from './Segment.js';
 import { Apple } from './Apple.js';
 
+// general settings
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
-const pixelSize = 40;
-let snake = new Snake(pixelSize,pixelSize*6, pixelSize);
+const pixelSize = 20;
+const refreshRate = 100;
+const growRate = 10;
+
+// snake starting positions
+const snakeStartX = pixelSize;
+const snakeStartY = pixelSize*4;
+
+// Game border widths/heights
+const gameboarderStart = 0;
+const gameboarderLimit = 800;
+
+// Apple spawn limits
+const appleSpawnStart = (gameboarderStart/pixelSize) + pixelSize/pixelSize;
+const appleSpawnLimit = (gameboarderLimit/pixelSize) - 2 * pixelSize/pixelSize;
+
+// Gameboard widths/heights
+const gameboardStart = gameboarderStart + pixelSize;
+const gameboardLimit = gameboarderLimit - pixelSize * 2;
+
+let snake = new Snake(snakeStartX , snakeStartY, pixelSize);
 let direction = 'r';
 let apple = new Apple(pixelSize*8,pixelSize*8);
+let gameOver = false;
 
 document.addEventListener('keydown', (event) => {
   var name = event.key;
@@ -18,24 +39,38 @@ document.addEventListener('keydown', (event) => {
 
 const move = () => {
 
-  // Dessine la grille de jeu
+  // Draw gameboard limits
   ctx.fillStyle = 'DarkRed';
-  ctx.fillRect(0, 0, 800, 800);
+  ctx.fillRect(gameboarderStart, gameboarderStart, gameboarderLimit, gameboarderLimit);
+
+  // Draw gameboard screen
   ctx.fillStyle = 'black';
-  ctx.fillRect(pixelSize, pixelSize, 720, 720);
-  // Rafraichit à chaque seconde
+  ctx.fillRect(gameboardStart, gameboardStart, gameboardLimit, gameboardLimit);
+
+  // Timer
   setTimeout(() => {
     requestAnimationFrame(move);
-  }, 150);
+  }, refreshRate);
+
+  // Draw snake
   drawSnake();
+  // Create new snake head
   createSegment();
+  // Remove snake butt
   removeSegment();
+  // Draw apple
   drawApple();
+  // if snake head touches apple then spawn new apple, add new head
   if (checkAppleColision()) {
     apple = spawnApple();
-    createSegment();
+    for (let i = 0; i < growRate; i++) {
+      createSegment();
+    }
   }
+  // Checks snake colisions with itself and the game borders
+  checkSnakeColision();
 };
+
 requestAnimationFrame(move);
 
 function drawSnake(){
@@ -91,28 +126,29 @@ function updateMoveDirection(keyPressed){
   }
 }
 function spawnApple(){
+  
   let appleXPos = 999;
   let appleYPos = 999;
+  
   let randomXNum;
   let randomYNum;
+  
   let xNums = [];
   let yNums = [];
 
+  // Saves all the x and y position values of the different snake segments
   for (let index = 0; index < snake.segments.length; index++) {
     xNums.push(snake.segments[index].x);
     yNums.push(snake.segments[index].y);
   }
+  // Generates random numbers between 1-18 (gameboard limits), while the numbers don't equate to any of the segment x & y values
   do {
-    randomXNum = Math.floor(Math.random() * 18)
-  } while (xNums.includes(randomXNum));
-  do {
-    randomYNum = Math.floor(Math.random() * 18)
-  } while (yNums.includes(randomYNum));
-
-  appleXPos = randomXNum*40;
-  appleYPos = randomYNum*40;
-  console.log(appleXPos);
-  console.log(appleYPos);
+    randomXNum = Math.floor(Math.random() * appleSpawnLimit)+ appleSpawnStart;
+    randomYNum = Math.floor(Math.random() * appleSpawnLimit)+ appleSpawnStart;
+    } while (xNums.includes(randomXNum && yNums.includes(randomYNum)));
+  
+  appleXPos = randomXNum*pixelSize;
+  appleYPos = randomYNum*pixelSize;
   return new Apple(appleXPos, appleYPos);
 }
 function drawApple(){
@@ -120,12 +156,34 @@ function drawApple(){
   ctx.fillRect(apple.x, apple.y, pixelSize, pixelSize);
 }
 function checkAppleColision(){
-  let index = snake.segments.length-1;
-  if (apple.x == snake.segments[index].x) {
-    if (apple.y == snake.segments[index].y){
-      return true;
-    }
+  let head = snake.segments.length-1;
+  // Check is apple and snake head overlap
+  if (apple.x == snake.segments[head].x && apple.y == snake.segments[head].y) {
+    return true;
   }
   return false;
 }
+function checkSnakeColision(){
+  const head = snake.segments[snake.segments.length-1];
+  const body = snake.segments.slice(0,snake.segments.length-1)
+  // Checks if snake head is within x bounds
+  if (head.x <= 0 || head.x >= 760) { 
+    return true;
+  }
+  // Checks if snake head is within y bounds
 
+  return checkY = head.find((element) => element.y <= 0 || element.y >= 760);
+  if (head.y <= 0 || head.y >= 760) {
+    return true;
+  }
+  // Checks if snake head overlaps with any segments
+  return body.some((element) => element.x === head.x && element.y === head.y);
+
+  // OLD CODE
+  // for (let i = 0; i < snake.segments.length-1; i++) {
+  //   if (snake.segments[head].x == snake.segments[i].x && snake.segments[head].y == snake.segments[i].y) {
+  //     return true;
+  //   }
+  // }
+
+}
