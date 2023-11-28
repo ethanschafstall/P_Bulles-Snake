@@ -61,13 +61,18 @@ const move = () => {
   // Draw apple
   drawApple();
   // if snake head touches apple then spawn new apple, add new head
-  if (checkAppleColision()) {
-    apple = spawnApple();
-    for (let i = 0; i < growRate; i++) {
-      createSegment();
-    }
-  }
+
+  checkAppleColision() ? (apple = spawnApple(), createSegment()) : null;
+  
+  // OLD CODE
+  // if (checkAppleColision()) {
+  //   apple = spawnApple();
+  //   for (let i = 0; i < growRate; i++) {
+  //     createSegment();
+  //   }
+  // }
   // Checks snake colisions with itself and the game borders
+
   checkSnakeColision();
 };
 
@@ -98,10 +103,23 @@ function createSegment(){
   }
 }
 function removeSegment(){
+
   snake.segments.shift();
+  
 }
 function updateMoveDirection(keyPressed){
   let index = snake.segments.length-1;
+
+  const directions = new Map([
+    ["KeyW", "u"],
+    ["KeyS", "d"],
+    ["KeyA", "l"],
+    ["KeyD", "r"]
+  ])
+
+  // (snake.segments[index-1].x != snake.segments[index].x) && keyPressed =? 
+
+
   switch (keyPressed) {
     case "KeyW":
       if (snake.segments[index-1].x != snake.segments[index].x) {
@@ -124,6 +142,7 @@ function updateMoveDirection(keyPressed){
       }
       break;
   }
+
 }
 function spawnApple(){
   
@@ -132,15 +151,18 @@ function spawnApple(){
   
   let randomXNum;
   let randomYNum;
-  
-  let xNums = [];
-  let yNums = [];
 
+  let xNums = snake.segments.map(a => a.x);
+  let yNums = snake.segments.map(a => a.y);
+  console.log(xNums);
   // Saves all the x and y position values of the different snake segments
-  for (let index = 0; index < snake.segments.length; index++) {
-    xNums.push(snake.segments[index].x);
-    yNums.push(snake.segments[index].y);
-  }
+  
+  // OLD CODE
+  // for (let index = 0; index < snake.segments.length; index++) {
+  //   xNums.push(snake.segments[index].x);
+  //   yNums.push(snake.segments[index].y);
+  // }
+
   // Generates random numbers between 1-18 (gameboard limits), while the numbers don't equate to any of the segment x & y values
   do {
     randomXNum = Math.floor(Math.random() * appleSpawnLimit)+ appleSpawnStart;
@@ -150,40 +172,28 @@ function spawnApple(){
   appleXPos = randomXNum*pixelSize;
   appleYPos = randomYNum*pixelSize;
   return new Apple(appleXPos, appleYPos);
+
 }
 function drawApple(){
+  
   ctx.fillStyle = 'green';
   ctx.fillRect(apple.x, apple.y, pixelSize, pixelSize);
+
 }
 function checkAppleColision(){
+
   let head = snake.segments.length-1;
+
   // Check is apple and snake head overlap
-  if (apple.x == snake.segments[head].x && apple.y == snake.segments[head].y) {
-    return true;
-  }
-  return false;
+  return apple.x == snake.segments[head].x && apple.y == snake.segments[head].y ? true : false;
 }
+
+// Function which checks for the snakes colisions, returns a true boolean if the snake is colliding something it shouldn't (hence gameover).
 function checkSnakeColision(){
+
   const head = snake.segments[snake.segments.length-1];
   const body = snake.segments.slice(0,snake.segments.length-1)
-  // Checks if snake head is within x bounds
-  if (head.x <= 0 || head.x >= 760) { 
-    return true;
-  }
-  // Checks if snake head is within y bounds
-
-  return checkY = head.find((element) => element.y <= 0 || element.y >= 760);
-  if (head.y <= 0 || head.y >= 760) {
-    return true;
-  }
-  // Checks if snake head overlaps with any segments
-  return body.some((element) => element.x === head.x && element.y === head.y);
-
-  // OLD CODE
-  // for (let i = 0; i < snake.segments.length-1; i++) {
-  //   if (snake.segments[head].x == snake.segments[i].x && snake.segments[head].y == snake.segments[i].y) {
-  //     return true;
-  //   }
-  // }
-
+  
+  // Checks if snake head is within gameboard x & y bounds, or if the snake head overlaps with any segments.
+  return head.y <= gameboardStart || head.y >= gameboardLimit || head.x <= gameboardStart || head.x >= gameboardLimit || body.some((element) => element.x === head.x && element.y === head.y);
 }
