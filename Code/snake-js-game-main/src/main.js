@@ -4,28 +4,28 @@ import { Segment } from './Segment.js';
 import { Apple } from './Apple.js';
 
 // general settings
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
-const pixelSize = 40;
-const refreshRate = 100;
+const CANVAS = document.querySelector('canvas');
+const CTX = CANVAS.getContext('2d');
+const PIXEL_SIZE = 40;
+const REFRESH_RATE = 100;
 
 // snake starting positions
-const snakeStartX = pixelSize;
-const snakeStartY = pixelSize*4;
+const SNAKE_START_X = PIXEL_SIZE;
+const SNAKE_START_Y = PIXEL_SIZE*4;
 
 // Game border widths/heights
-const gameboarderStart = 0;
-const gameboarderLimit = 800;
+const BOARDER_START = 0;
+const BOARDER_LIMIT = 800;
 // Apple spawn limidts
-const appleSpawnStart = (gameboarderStart/pixelSize) + pixelSize/pixelSize;
-const appleSpawnLimit = (gameboarderLimit/pixelSize) - 2 * pixelSize/pixelSize;
+const APPLE_SPAWN_START = (BOARDER_START/PIXEL_SIZE) + PIXEL_SIZE/PIXEL_SIZE;
+const APPLE_SPAWN_LIMIT = (BOARDER_LIMIT/PIXEL_SIZE) - 2 * PIXEL_SIZE/PIXEL_SIZE;
 
 // Gameboard widths/heights
-const gameboardStart = gameboarderStart + pixelSize;
-const gameboardLimit = gameboarderLimit - pixelSize * 2;
+const GAMEBOARD_START = BOARDER_START + PIXEL_SIZE;
+const GAMEBOARD_LIMIT = BOARDER_LIMIT - PIXEL_SIZE * 2;
 
 
-let snake = new Snake(snakeStartX , snakeStartY, pixelSize);
+let snake = new Snake(SNAKE_START_X , SNAKE_START_Y, PIXEL_SIZE);
 let apple;
 let gameOver = false;
 let direction = 'r';
@@ -42,22 +42,22 @@ document.addEventListener('keydown', (event) => {
 const move = () => {
 
   // Draw gameboard limits
-  ctx.fillStyle = 'DarkRed';
-  ctx.fillRect(gameboarderStart, gameboarderStart, gameboarderLimit, gameboarderLimit);
+  CTX.fillStyle = 'DarkRed';
+  CTX.fillRect(BOARDER_START, BOARDER_START, BOARDER_LIMIT, BOARDER_LIMIT);
 
   // Draw gameboard screen
-  ctx.fillStyle = 'black';
-  ctx.fillRect(gameboardStart, gameboardStart, gameboardLimit, gameboardLimit);
+  CTX.fillStyle = 'black';
+  CTX.fillRect(GAMEBOARD_START, GAMEBOARD_START, GAMEBOARD_LIMIT, GAMEBOARD_LIMIT);
 
-  ctx.font = `${pixelSize}px Geo`;
-  ctx.fillStyle = "white";
-  ctx.textAlign = "center";
-  ctx.fillText(`Score: ${score}`, gameboardLimit/2+16, gameboardStart-pixelSize/5); 
+  CTX.font = `${PIXEL_SIZE}px Geo`;
+  CTX.fillStyle = "white";
+  CTX.textAlign = "center";
+  CTX.fillText(`Score: ${score}`, GAMEBOARD_LIMIT/2+16, GAMEBOARD_START-PIXEL_SIZE/5); 
 
   // Timer
   setTimeout(() => {
     requestAnimationFrame(move);
-  }, refreshRate);
+  }, REFRESH_RATE);
 
   //
   gameStart ? (apple = spawnApple(), gameStart = false): undefined;
@@ -79,8 +79,8 @@ const move = () => {
 requestAnimationFrame(move);
 // Function for drawing a snake segment
 function drawSegment(x, y){
-    ctx.fillStyle = 'red';
-    ctx.fillRect(x, y, pixelSize, pixelSize);
+    CTX.fillStyle = 'red';
+    CTX.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
 }
 
 function repeatFor(number, myFunction){
@@ -95,16 +95,16 @@ function createSegment(){
   let index = snake.segments.length-1;
   switch (direction) {
     case 'u':
-      snake.segments.push(new Segment(snake.segments[index].x,snake.segments[index].y-pixelSize));
+      snake.segments.push(new Segment(snake.segments[index].x,snake.segments[index].y-PIXEL_SIZE));
       break;
     case 'd':
-      snake.segments.push(new Segment(snake.segments[index].x,snake.segments[index].y+pixelSize));
+      snake.segments.push(new Segment(snake.segments[index].x,snake.segments[index].y+PIXEL_SIZE));
       break;
     case 'l':
-      snake.segments.push(new Segment(snake.segments[index].x-pixelSize,snake.segments[index].y));
+      snake.segments.push(new Segment(snake.segments[index].x-PIXEL_SIZE,snake.segments[index].y));
     break;
     case 'r':
-      snake.segments.push(new Segment(snake.segments[index].x+pixelSize,snake.segments[index].y));
+      snake.segments.push(new Segment(snake.segments[index].x+PIXEL_SIZE,snake.segments[index].y));
       break;
       
   }
@@ -177,19 +177,19 @@ function spawnApple(){
 
   // Generates random numbers between 1-18 (gameboard limits), while the numbers don't equate to any of the segment x & y values
   do {
-    randomXNum = Math.floor(Math.random() * appleSpawnLimit)+ appleSpawnStart;
-    randomYNum = Math.floor(Math.random() * appleSpawnLimit)+ appleSpawnStart;
+    randomXNum = Math.floor(Math.random() * APPLE_SPAWN_LIMIT)+ APPLE_SPAWN_START;
+    randomYNum = Math.floor(Math.random() * APPLE_SPAWN_LIMIT)+ APPLE_SPAWN_START;
     } while (xNums.includes(randomXNum && yNums.includes(randomYNum)));
   
-  appleXPos = randomXNum*pixelSize;
-  appleYPos = randomYNum*pixelSize;
+  appleXPos = randomXNum*PIXEL_SIZE;
+  appleYPos = randomYNum*PIXEL_SIZE;
   return new Apple(appleXPos, appleYPos);
 
 }
 function drawApple(){
   
-  ctx.fillStyle = 'green';
-  ctx.fillRect(apple.x, apple.y, pixelSize, pixelSize);
+  CTX.fillStyle = 'green';
+  CTX.fillRect(apple.x, apple.y, PIXEL_SIZE, PIXEL_SIZE);
 
 }
 function checkAppleColision(){
@@ -207,6 +207,6 @@ function checkSnakeColision(){
   const body = snake.segments.slice(0,snake.segments.length-1)
 
   // Checks if snake head is within gameboard x & y bounds, or if the snake head overlaps with any segments.
-  return (head.y < gameboardStart) || (head.y > gameboardLimit) || (head.x < gameboardStart) || (head.x > gameboardLimit) 
+  return (head.y < GAMEBOARD_START) || (head.y > GAMEBOARD_LIMIT) || (head.x < GAMEBOARD_START) || (head.x > GAMEBOARD_LIMIT) 
   || (body.some((element) => element.x === head.x && element.y === head.y));
 }
