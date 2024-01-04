@@ -1,10 +1,9 @@
-import { Apple } from "./Apple";
 import { Segment } from "./Segment";
-
 export class Snake
 {
-    constructor(x,y,spacer)
+    constructor(x,y, direction)
     {
-        this.segments = [new Segment(x,y),new Segment(x+spacer,y),new Segment(x+spacer*2,y)];
+        this.segments = [new Segment(x,y),new Segment(x,y),new Segment(x,y)];
+        this.direction = direction;
     }
 }

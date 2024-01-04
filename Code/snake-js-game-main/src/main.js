@@ -16,7 +16,7 @@ const SNAKE_START_Y = PIXEL_SIZE*4;
 // Game border widths/heights
 const BOARDER_START = 0;
 const BOARDER_LIMIT = 800;
-// Apple spawn limidts
+// Apple spawn limits
 const APPLE_SPAWN_START = (BOARDER_START/PIXEL_SIZE) + PIXEL_SIZE/PIXEL_SIZE;
 const APPLE_SPAWN_LIMIT = (BOARDER_LIMIT/PIXEL_SIZE) - 2 * PIXEL_SIZE/PIXEL_SIZE;
 
@@ -25,16 +25,13 @@ const GAMEBOARD_START = BOARDER_START + PIXEL_SIZE;
 const GAMEBOARD_LIMIT = BOARDER_LIMIT - PIXEL_SIZE * 2;
 
 
-let snake = new Snake(SNAKE_START_X , SNAKE_START_Y, PIXEL_SIZE);
+let snake = new Snake(SNAKE_START_X , SNAKE_START_Y, 'r');
 let apple;
 let gameOver = false;
-let direction = 'r';
 let score = 0;
 let gameStart = true;
-let growRate = 2;
 
 document.addEventListener('keydown', (event) => {
-  var name = event.key;
   var code = event.code;
   updateMoveDirection(code);
 }, false);
@@ -59,73 +56,65 @@ const move = () => {
     requestAnimationFrame(move);
   }, REFRESH_RATE);
 
+  const head = snake.segments[snake.segments.length-1];
+  
   //
   gameStart ? (apple = spawnApple(), gameStart = false): undefined;
 
   // Draw snake
   snake.segments.forEach(e => drawSegment(e.x, e.y));
   // Create new snake head
-  createSegment();
-  // Remove snake butt
-  removeSegment();
+  updateSnake();
   // Draw apple
   drawApple();
 
-  checkAppleColision() ? (apple = spawnApple(), repeatFor(growRate, createSegment), score++) : undefined;
+  checkAppleColision() ? (apple = spawnApple(), createSegment(), score++) : undefined;
 
-  checkSnakeColision() ? resetGame() : undefined;
+  checkSnakeColision() ? location.reload() : undefined;
 };
 
 requestAnimationFrame(move);
+
 // Function for drawing a snake segment
 function drawSegment(x, y){
     CTX.fillStyle = 'red';
     CTX.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
 }
 
-function repeatFor(number, myFunction){
-  for (let index = 0; index < number; index++) {
-    myFunction();
-  }
-}
-
-function resetGame() {
-  snake = new Snake(snakeStartX, snakeStartY, PIXEL_SIZE);
-  apple = null; // reset apple
-  gameOver = false;
-  direction = 'r';
-  score = 0;
-  gameStart = true;
-}
-
 // Function for creating a new snake segment
-function createSegment(){
-  
-  const { x, y } = snake.segments[snake.segments.length - 1];
+function createSegment() {
+  const { x, y } = snake.segments[0];
+  snake.segments.unshift(new Segment(x, y));
+}
 
-  switch (direction) {
+// Function which updates the whole snake (head and tail) by pushing a new segment, based on move direction to the end of the segment array.
+// and shifts(removes) first segment of the segment array.
+function updateSnake() {
+  const { x, y } = snake.segments[snake.segments.length - 1];
+  let newX, newY;
+  switch (snake.direction) {
     case 'u':
-      snake.segments.push(new Segment(x, y - PIXEL_SIZE));
+      newX = x;
+      newY = y - PIXEL_SIZE;
       break;
     case 'd':
-      snake.segments.push(new Segment(x, y + PIXEL_SIZE));
+      newX = x;
+      newY = y + PIXEL_SIZE;
       break;
     case 'l':
-      snake.segments.push(new Segment(x - PIXEL_SIZE, y));
-    break;
-    case 'r':
-      snake.segments.push(new Segment(x + PIXEL_SIZE, y));
+      newX = x - PIXEL_SIZE;
+      newY = y;
       break;
-      
+    case 'r':
+      newX = x + PIXEL_SIZE;
+      newY = y;
+      break;
   }
-}
-// Function for removing a snake segment
-function removeSegment(){
-  
+  snake.segments.push(new Segment(newX, newY));
   snake.segments.shift();
-  
 }
 
+// Function which updates the snake move direction
 function updateMoveDirection(keyPressed){
  
   let index = snake.segments.length-1;
@@ -133,50 +122,52 @@ function updateMoveDirection(keyPressed){
   switch (keyPressed) {
     case "KeyW":
       if (snake.segments[index-1].x != snake.segments[index].x) {
-        direction = 'u';
+        snake.direction = 'u';
       }
       break;
     case "KeyS":
       if (snake.segments[index-1].x != snake.segments[index].x) {
-        direction = 'd';
+        snake.direction = 'd';
       }
       break;
     case "KeyA":
       if (snake.segments[index-1].y != snake.segments[index].y) {
-        direction = 'l';
+        snake.direction = 'l';
       }
       break;
     case "KeyD":
       if (snake.segments[index-1].y != snake.segments[index].y) {
-        direction = 'r';
+        snake.direction = 'r';
       }
       break;
     case "ArrowUp":
       if (snake.segments[index-1].x != snake.segments[index].x) {
-        direction = 'u';
+        snake.direction = 'u';
       }
       break;
       case "ArrowDown":
         if (snake.segments[index-1].x != snake.segments[index].x) {
-          direction = 'd';
+          snake.direction = 'd';
         }
         break;
       case "ArrowLeft":
         if (snake.segments[index-1].y != snake.segments[index].y) {
-          direction = 'l';
+          snake.direction = 'l';
         }
         break;
       case "ArrowRight":
         if (snake.segments[index-1].y != snake.segments[index].y) {
-          direction = 'r';
+          snake.direction = 'r';
         }
         break;     
   }
 }
+
+// Function that returns an apple object which x & y positions that aren't equal to any of the snake segments x & y pos.
 function spawnApple(){
   
-  let appleXPos = 999;
-  let appleYPos = 999;
+  let appleXPos;
+  let appleYPos;
   
   let randomXNum;
   let randomYNum;
@@ -189,13 +180,14 @@ function spawnApple(){
   do {
     randomXNum = Math.floor(Math.random() * APPLE_SPAWN_LIMIT)+ APPLE_SPAWN_START;
     randomYNum = Math.floor(Math.random() * APPLE_SPAWN_LIMIT)+ APPLE_SPAWN_START;
-    } while (xNums.includes(randomXNum && yNums.includes(randomYNum)));
+    } while (xNums.includes(randomXNum) && yNums.includes(randomYNum));
   
   appleXPos = randomXNum*PIXEL_SIZE;
   appleYPos = randomYNum*PIXEL_SIZE;
   return new Apple(appleXPos, appleYPos);
 
 }
+// 
 function drawApple(){
   
   CTX.fillStyle = 'green';
@@ -206,25 +198,18 @@ function checkAppleColision(){
 
   const head = snake.segments[snake.segments.length-1];
 
-  // Check is apple and snake head overlap
+  // Check if the apple and snake head are overlapping.
   return apple.x == head.x && apple.y == head.y ? true : false;
 }
 
-// Function which checks for the snakes colisions, returns a true boolean if the snake is colliding something it shouldn't (hence gameover).
+// Function which checks for the snakes colisions, returns a true boolean if the snake is colliding something it shouldn't.
 function checkSnakeColision(){
 
   const head = snake.segments[snake.segments.length - 1];
-  const isOutOfBounds = head.y < gameboardStart || head.y > gameboardLimit || head.x < gameboardStart || head.x > gameboardLimit;
+  // condition for if the snake is out of gameboard bounderies.
+  const isOutOfBounds = head.y < GAMEBOARD_START || head.y > GAMEBOARD_LIMIT || head.x < GAMEBOARD_START || head.x > GAMEBOARD_LIMIT;
+  // condition for if snake is overlapping with itself.
   const isBodyOverlap = snake.segments.slice(0, snake.segments.length - 1).some(element => element.x === head.x && element.y === head.y);
  
   return isOutOfBounds || isBodyOverlap;
-}
-
-function resetGame() {
-  snake = new Snake(snakeStartX, snakeStartY, PIXEL_SIZE);
-  apple = null; // reset apple
-  gameOver = false;
-  direction = 'r';
-  score = 0;
-  gameStart = true;
 }
