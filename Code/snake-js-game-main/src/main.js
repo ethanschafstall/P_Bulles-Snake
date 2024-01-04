@@ -52,7 +52,7 @@ const move = () => {
   CTX.font = `${PIXEL_SIZE}px Geo`;
   CTX.fillStyle = "white";
   CTX.textAlign = "center";
-  CTX.fillText(`Score: ${score}`, GAMEBOARD_LIMIT/2+16, GAMEBOARD_START-PIXEL_SIZE/5); 
+  CTX.fillText(`Score: ${score}`, GAMEBOARD_LIMIT / 2 + 16, GAMEBOARD_START - PIXEL_SIZE / 5);
 
   // Timer
   setTimeout(() => {
@@ -73,7 +73,7 @@ const move = () => {
 
   checkAppleColision() ? (apple = spawnApple(), repeatFor(growRate, createSegment), score++) : undefined;
 
-  checkSnakeColision() ? location.reload() : undefined;
+  checkSnakeColision() ? resetGame() : undefined;
 };
 
 requestAnimationFrame(move);
@@ -89,22 +89,32 @@ function repeatFor(number, myFunction){
   }
 }
 
+function resetGame() {
+  snake = new Snake(snakeStartX, snakeStartY, PIXEL_SIZE);
+  apple = null; // reset apple
+  gameOver = false;
+  direction = 'r';
+  score = 0;
+  gameStart = true;
+}
+
 // Function for creating a new snake segment
 function createSegment(){
   
-  let index = snake.segments.length-1;
+  const { x, y } = snake.segments[snake.segments.length - 1];
+
   switch (direction) {
     case 'u':
-      snake.segments.push(new Segment(snake.segments[index].x,snake.segments[index].y-PIXEL_SIZE));
+      snake.segments.push(new Segment(x, y - PIXEL_SIZE));
       break;
     case 'd':
-      snake.segments.push(new Segment(snake.segments[index].x,snake.segments[index].y+PIXEL_SIZE));
+      snake.segments.push(new Segment(x, y + PIXEL_SIZE));
       break;
     case 'l':
-      snake.segments.push(new Segment(snake.segments[index].x-PIXEL_SIZE,snake.segments[index].y));
+      snake.segments.push(new Segment(x - PIXEL_SIZE, y));
     break;
     case 'r':
-      snake.segments.push(new Segment(snake.segments[index].x+PIXEL_SIZE,snake.segments[index].y));
+      snake.segments.push(new Segment(x + PIXEL_SIZE, y));
       break;
       
   }
@@ -203,10 +213,18 @@ function checkAppleColision(){
 // Function which checks for the snakes colisions, returns a true boolean if the snake is colliding something it shouldn't (hence gameover).
 function checkSnakeColision(){
 
-  const head = snake.segments[snake.segments.length-1];
-  const body = snake.segments.slice(0,snake.segments.length-1)
+  const head = snake.segments[snake.segments.length - 1];
+  const isOutOfBounds = head.y < gameboardStart || head.y > gameboardLimit || head.x < gameboardStart || head.x > gameboardLimit;
+  const isBodyOverlap = snake.segments.slice(0, snake.segments.length - 1).some(element => element.x === head.x && element.y === head.y);
+ 
+  return isOutOfBounds || isBodyOverlap;
+}
 
-  // Checks if snake head is within gameboard x & y bounds, or if the snake head overlaps with any segments.
-  return (head.y < GAMEBOARD_START) || (head.y > GAMEBOARD_LIMIT) || (head.x < GAMEBOARD_START) || (head.x > GAMEBOARD_LIMIT) 
-  || (body.some((element) => element.x === head.x && element.y === head.y));
+function resetGame() {
+  snake = new Snake(snakeStartX, snakeStartY, PIXEL_SIZE);
+  apple = null; // reset apple
+  gameOver = false;
+  direction = 'r';
+  score = 0;
+  gameStart = true;
 }
