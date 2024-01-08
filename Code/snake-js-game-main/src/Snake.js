@@ -1,4 +1,5 @@
 import { Segment } from "./Segment";
+
 export class Snake
 {
     constructor(x,y, direction)
