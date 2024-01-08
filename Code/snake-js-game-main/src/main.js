@@ -90,27 +90,25 @@ const createSegment = () => {
 // Function which updates the whole snake (head and tail) by pushing a new segment, based on move direction to the end of the segment array.
 // and shifts(removes) first segment of the segment array.
 const updateSnake = () => {
-  const { x, y } = snake.segments[snake.segments.length - 1];
-  let newX, newY;
+  
+  let { x, y } = snake.segments[snake.segments.length - 1];
+
+  // Checks the direction in which the snake is moving and modifies the axis affected.
   switch (snake.direction) {
     case 'u':
-      newX = x;
-      newY = y - PIXEL_SIZE;
+      y -= PIXEL_SIZE;
       break;
     case 'd':
-      newX = x;
-      newY = y + PIXEL_SIZE;
+      y += PIXEL_SIZE;
       break;
     case 'l':
-      newX = x - PIXEL_SIZE;
-      newY = y;
+      x -= PIXEL_SIZE;
       break;
     case 'r':
-      newX = x + PIXEL_SIZE;
-      newY = y;
+      x += PIXEL_SIZE;
       break;
   }
-  snake.segments.push(new Segment(newX, newY));
+  snake.segments.push(new Segment(x, y));
   snake.segments.shift();
 }
 
@@ -139,27 +137,7 @@ const updateMoveDirection = (keyPressed) => {
       if (snake.segments[index-1].y != snake.segments[index].y) {
         snake.direction = 'r';
       }
-      break;
-    case "ArrowUp":
-      if (snake.segments[index-1].x != snake.segments[index].x) {
-        snake.direction = 'u';
-      }
-      break;
-      case "ArrowDown":
-        if (snake.segments[index-1].x != snake.segments[index].x) {
-          snake.direction = 'd';
-        }
-        break;
-      case "ArrowLeft":
-        if (snake.segments[index-1].y != snake.segments[index].y) {
-          snake.direction = 'l';
-        }
-        break;
-      case "ArrowRight":
-        if (snake.segments[index-1].y != snake.segments[index].y) {
-          snake.direction = 'r';
-        }
-        break;     
+      break;   
   }
 }
 
