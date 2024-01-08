@@ -76,20 +76,20 @@ const move = () => {
 requestAnimationFrame(move);
 
 // Function for drawing a snake segment
-function drawSegment(x, y){
+const drawSegment = (x, y) => {
     CTX.fillStyle = 'red';
     CTX.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
 }
 
 // Function for creating a new snake segment
-function createSegment() {
+const createSegment = () => {
   const { x, y } = snake.segments[0];
   snake.segments.unshift(new Segment(x, y));
 }
 
 // Function which updates the whole snake (head and tail) by pushing a new segment, based on move direction to the end of the segment array.
 // and shifts(removes) first segment of the segment array.
-function updateSnake() {
+const updateSnake = () => {
   const { x, y } = snake.segments[snake.segments.length - 1];
   let newX, newY;
   switch (snake.direction) {
@@ -115,7 +115,7 @@ function updateSnake() {
 }
 
 // Function which updates the snake move direction
-function updateMoveDirection(keyPressed){
+const updateMoveDirection = (keyPressed) => {
  
   let index = snake.segments.length-1;
 
@@ -164,7 +164,7 @@ function updateMoveDirection(keyPressed){
 }
 
 // Function that returns an apple object which x & y positions that aren't equal to any of the snake segments x & y pos.
-function spawnApple(){
+const spawnApple = () => {
   
   let appleXPos;
   let appleYPos;
@@ -188,13 +188,13 @@ function spawnApple(){
 
 }
 // 
-function drawApple(){
+const drawApple = () => {
   
   CTX.fillStyle = 'green';
   CTX.fillRect(apple.x, apple.y, PIXEL_SIZE, PIXEL_SIZE);
 
 }
-function checkAppleColision(){
+const checkAppleColision = () => {
 
   const head = snake.segments[snake.segments.length-1];
 
@@ -203,7 +203,7 @@ function checkAppleColision(){
 }
 
 // Function which checks for the snakes colisions, returns a true boolean if the snake is colliding something it shouldn't.
-function checkSnakeColision(){
+const checkSnakeColision = () => {
 
   const head = snake.segments[snake.segments.length - 1];
   // condition for if the snake is out of gameboard bounderies.
