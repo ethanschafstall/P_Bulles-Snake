@@ -147,9 +147,9 @@ const updateSnake = () => {
       x += PIXEL_SIZE;
       break;
   }
-  // adds said new segment (head) to the array.
+  // creates new segment (head) and adds it to the array.
   snake.segments.push(new Segment(x, y));
-  // removes first segment (tail) from the array.
+  // removes the first segment (tail) from the array.
   snake.segments.shift();
 }
 
